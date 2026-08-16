@@ -1,0 +1,33 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: scdt
+      POSTGRES_PASSWORD: scdt_local_dev
+      POSTGRES_DB: scdt
+    ports:
+      # Host port 5433 (not 5432) to avoid clashing with a native/local
+      # PostgreSQL install that may already own 5432 on the host machine.
+      - "5433:5432"
+    volumes:
+      - scdt_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U scdt"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  scdt_postgres_data:

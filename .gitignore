@@ -1,0 +1,41 @@
+# Node
+node_modules/
+dist/
+build/
+.next/
+out/
+*.log
+npm-debug.log*
+.npm/
+coverage/
+
+# Env
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Docker
+*.pid
+
+# Editors / OS
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/
+.idea/
+
+# Prisma
+apps/api/prisma/*.db
+
+# Playwright MCP scratch
+.playwright-mcp/

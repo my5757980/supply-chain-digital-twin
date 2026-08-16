@@ -1,0 +1,6 @@
+sku,name,quantity_on_hand,reorder_threshold
+SKU-1001,Bottled Water 500ml (24 pack),120,40
+SKU-1002,Cooking Oil 5L,45,20
+SKU-1003,Basmati Rice 10kg,60,25
+SKU-1004,Sugar 5kg,18,20
+SKU-1005,Tea Bags (500 count),75,30

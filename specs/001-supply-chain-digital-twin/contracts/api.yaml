@@ -1,0 +1,455 @@
+openapi: 3.0.3
+info:
+  title: Supply Chain Digital Twin API
+  version: "0.1.0"
+  description: >
+    API-first contract for the du SME Resilience Challenge (Track 1)
+    Supply Chain Digital Twin. Served by the NestJS Ingestion/Twin/Action
+    service, except /predictions and /recommendations generation which is
+    produced by the internal FastAPI AI service and exposed here through
+    the same public gateway (Principle IX: action layer only consumes
+    prediction-layer outputs, never the reverse).
+servers:
+  - url: https://api.{env}.scdt.example/v1
+    variables:
+      env:
+        default: pilot
+
+security:
+  - sessionAuth: []
+
+paths:
+  /tenants:
+    post:
+      summary: Onboard a new SME (Tenant)
+      operationId: createTenant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [business_name, sector, owner_email_or_phone]
+              properties:
+                business_name: { type: string }
+                sector: { type: string }
+                owner_email_or_phone: { type: string }
+      responses:
+        "201":
+          description: Tenant created, onboarding_status = pending
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Tenant" }
+
+  /data-sources/csv-upload:
+    post:
+      summary: Upload a CSV of inventory, orders, or supplier data (FR-001)
+      operationId: uploadCsv
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file, data_type]
+              properties:
+                file: { type: string, format: binary }
+                data_type:
+                  type: string
+                  enum: [inventory, orders, suppliers]
+      responses:
+        "202":
+          description: Accepted for async ingestion processing
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data_source_id: { type: string, format: uuid }
+                  status: { type: string, enum: [processing] }
+
+  /inventory-items:
+    get:
+      summary: List inventory items for the authenticated tenant
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/InventoryItem" }
+    post:
+      summary: Manually create/update an inventory item (FR-001 manual path)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/InventoryItemInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/InventoryItem" }
+
+  /suppliers:
+    get:
+      summary: List suppliers (primary + backup) for the tenant
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Supplier" }
+    post:
+      summary: Register a supplier (including backup suppliers, FR-006)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SupplierInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Supplier" }
+
+  /twin:
+    get:
+      summary: Get the current Digital Twin snapshot for the tenant (FR-002)
+      description: >
+        Read-model aggregation over inventory, orders, suppliers, and
+        logistics events; served from Redis cache, recomputed on write.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TwinSnapshot" }
+
+  /predictions:
+    get:
+      summary: List disruption predictions for the tenant, incl. history (FR-012)
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [active, resolved_true_positive, resolved_false_positive, expired]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/DisruptionPrediction" }
+
+  /predictions/{id}:
+    get:
+      summary: Get a single disruption prediction
+      parameters:
+        - $ref: "#/components/parameters/idParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DisruptionPrediction" }
+
+  /alerts:
+    get:
+      summary: List alerts for the tenant, ranked by severity (FR-015)
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [new, acknowledged, acted_on, dismissed, escalated, expired]
+      responses:
+        "200":
+          description: OK, ordered by severity desc then created_at desc
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Alert" }
+
+  /alerts/{id}:
+    get:
+      summary: Get a single alert with its contingency plan/recommendation
+      parameters:
+        - $ref: "#/components/parameters/idParam"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AlertDetail" }
+
+  /alerts/{id}/decision:
+    post:
+      summary: Record the owner/staff decision on an alert's recommendation (FR-008)
+      parameters:
+        - $ref: "#/components/parameters/idParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [decision]
+              properties:
+                decision:
+                  type: string
+                  enum: [accepted, modified, dismissed]
+                modification_notes:
+                  type: string
+                  description: required when decision = modified
+      responses:
+        "200":
+          description: Decision recorded
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Recommendation" }
+
+  /auto-trigger-rules:
+    get:
+      summary: List auto-trigger rules for the tenant (FR-005, owner-only)
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/AutoTriggerRule" }
+    post:
+      summary: Create an auto-trigger rule (owner-only; role enforced server-side)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AutoTriggerRuleInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AutoTriggerRule" }
+        "403":
+          description: Requester is not an owner
+
+  /audit-logs:
+    get:
+      summary: List audit log entries for the tenant (Principle IV/V; owner and platform_admin only)
+      parameters:
+        - name: entity_type
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/AuditLogEntry" }
+
+  /events/stream:
+    get:
+      summary: Server-Sent Events stream of twin updates and new/escalated alerts (FR-014)
+      description: >
+        text/event-stream. Event types: `twin.updated`, `alert.created`,
+        `alert.escalated`. Chosen over WebSockets per research.md §3
+        (one-directional server→client push only).
+      responses:
+        "200":
+          description: SSE stream established
+          content:
+            text/event-stream:
+              schema:
+                type: string
+
+components:
+  securitySchemes:
+    sessionAuth:
+      type: apiKey
+      in: cookie
+      name: session
+
+  parameters:
+    idParam:
+      name: id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+
+  schemas:
+    Tenant:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        business_name: { type: string }
+        sector: { type: string }
+        country: { type: string, example: "AE" }
+        onboarding_status: { type: string, enum: [pending, data_connected, active] }
+        owner_user_id:
+          type: string
+          format: uuid
+          description: >
+            Dev-mode-only bootstrap field so the onboarding UI can establish
+            a session via the temporary dev-login shim (research.md §6).
+            Not part of the permanent contract — expected to be dropped once
+            a real managed auth provider's own post-signup flow replaces it.
+
+    InventoryItemInput:
+      type: object
+      required: [sku, name, quantity_on_hand]
+      properties:
+        sku: { type: string }
+        name: { type: string }
+        quantity_on_hand: { type: number }
+        reorder_threshold: { type: number }
+
+    InventoryItem:
+      allOf:
+        - $ref: "#/components/schemas/InventoryItemInput"
+        - type: object
+          properties:
+            id: { type: string, format: uuid }
+            data_source_id: { type: string, format: uuid }
+            updated_at: { type: string, format: date-time }
+
+    SupplierInput:
+      type: object
+      required: [name, kind]
+      properties:
+        name: { type: string }
+        kind: { type: string, enum: [primary, backup] }
+        typical_lead_time_days: { type: integer }
+        location: { type: string }
+
+    Supplier:
+      allOf:
+        - $ref: "#/components/schemas/SupplierInput"
+        - type: object
+          properties:
+            id: { type: string, format: uuid }
+            status: { type: string, enum: [active, delayed, at_risk] }
+
+    TwinSnapshot:
+      type: object
+      properties:
+        tenant_id: { type: string, format: uuid }
+        computed_at: { type: string, format: date-time }
+        inventory_summary:
+          type: array
+          items: { $ref: "#/components/schemas/InventoryItem" }
+        suppliers:
+          type: array
+          items: { $ref: "#/components/schemas/Supplier" }
+        open_orders_count: { type: integer }
+        stale_data_warnings:
+          type: array
+          items:
+            type: object
+            properties:
+              data_source_id: { type: string, format: uuid }
+              affected_area: { type: string }
+
+    DisruptionPrediction:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        type: { type: string, enum: [supplier_delay, port_congestion, demand_spike] }
+        affected_supplier_id: { type: string, format: uuid, nullable: true }
+        affected_inventory_item_ids:
+          type: array
+          items: { type: string, format: uuid }
+        confidence_score: { type: number, minimum: 0, maximum: 1 }
+        predicted_impact_at: { type: string, format: date-time }
+        status:
+          type: string
+          enum: [active, resolved_true_positive, resolved_false_positive, expired]
+        created_by_agent: { type: string }
+        created_at: { type: string, format: date-time }
+
+    Alert:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        disruption_prediction_id: { type: string, format: uuid }
+        severity: { type: string, enum: [low, medium, high, critical] }
+        status:
+          type: string
+          enum: [new, acknowledged, acted_on, dismissed, escalated, expired]
+        channels_sent:
+          type: array
+          items: { type: string }
+        created_at: { type: string, format: date-time }
+
+    AlertDetail:
+      allOf:
+        - $ref: "#/components/schemas/Alert"
+        - type: object
+          properties:
+            prediction: { $ref: "#/components/schemas/DisruptionPrediction" }
+            recommendation: { $ref: "#/components/schemas/Recommendation" }
+
+    Recommendation:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        alert_id: { type: string, format: uuid }
+        steps:
+          type: array
+          items: { type: string }
+        recommended_supplier_id: { type: string, format: uuid, nullable: true }
+        recommended_directory_entry_id: { type: string, format: uuid, nullable: true }
+        owner_decision: { type: string, enum: [pending, accepted, modified, dismissed] }
+        auto_triggered: { type: boolean }
+        recommended_supplier_name:
+          type: string
+          nullable: true
+          description: >
+            Denormalized display name, present only on GET /alerts/{id}'s
+            nested recommendation (not on the bare Recommendation object
+            returned by POST /alerts/{id}/decision).
+        recommended_directory_entry_name:
+          type: string
+          nullable: true
+          description: Same denormalization as recommended_supplier_name.
+
+    AutoTriggerRuleInput:
+      type: object
+      required: [enabled]
+      properties:
+        scope_supplier_id: { type: string, format: uuid, nullable: true }
+        enabled: { type: boolean }
+        conditions:
+          type: object
+          description: 'e.g., {"max_order_value": 5000, "min_confidence": 0.85}'
+
+    AutoTriggerRule:
+      allOf:
+        - $ref: "#/components/schemas/AutoTriggerRuleInput"
+        - type: object
+          properties:
+            id: { type: string, format: uuid }
+            created_by_user_id: { type: string, format: uuid }
+
+    AuditLogEntry:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        actor: { type: string, example: "agent:prediction-agent-v1" }
+        action: { type: string, example: "recommendation.auto_triggered" }
+        entity_type: { type: string }
+        entity_id: { type: string, format: uuid }
+        payload: { type: object }
+        created_at: { type: string, format: date-time }

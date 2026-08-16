@@ -1,0 +1,132 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+  Design tokens. Light is the default; dark follows the OS preference.
+  Every colour the UI uses is defined here so a page never hard-codes one —
+  that's what keeps the whole product looking like one system.
+*/
+:root {
+  --background: 210 40% 98%;
+  --surface: 0 0% 100%;
+  --surface-muted: 210 40% 96%;
+  --foreground: 222 47% 11%;
+  --muted-foreground: 215 16% 47%;
+  --border: 214 32% 91%;
+
+  --primary: 243 75% 59%;
+  --primary-hover: 244 58% 51%;
+  --primary-foreground: 0 0% 100%;
+  --primary-soft: 243 100% 97%;
+
+  --success: 160 84% 30%;
+  --success-soft: 152 76% 94%;
+  --warning: 38 92% 45%;
+  --warning-soft: 48 96% 91%;
+  --danger: 349 79% 48%;
+  --danger-soft: 350 100% 96%;
+  --info: 199 89% 44%;
+  --info-soft: 204 94% 94%;
+
+  --ring: 243 75% 59%;
+  --radius: 0.75rem;
+  --shadow-card: 0 1px 2px 0 rgb(15 23 42 / 0.04), 0 1px 3px 0 rgb(15 23 42 / 0.06);
+  --shadow-raised: 0 4px 6px -1px rgb(15 23 42 / 0.07), 0 2px 4px -2px rgb(15 23 42 / 0.05);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --background: 222 47% 8%;
+    --surface: 222 40% 12%;
+    --surface-muted: 222 33% 16%;
+    --foreground: 210 40% 96%;
+    --muted-foreground: 215 20% 65%;
+    --border: 217 25% 22%;
+
+    --primary: 243 82% 68%;
+    --primary-hover: 243 82% 74%;
+    --primary-foreground: 222 47% 11%;
+    --primary-soft: 243 40% 20%;
+
+    --success: 158 64% 52%;
+    --success-soft: 160 45% 17%;
+    --warning: 43 96% 58%;
+    --warning-soft: 38 45% 18%;
+    --danger: 350 89% 68%;
+    --danger-soft: 350 40% 20%;
+    --info: 199 89% 62%;
+    --info-soft: 200 45% 18%;
+
+    --ring: 243 82% 68%;
+    --shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.3), 0 1px 3px 0 rgb(0 0 0 / 0.25);
+    --shadow-raised: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+  }
+}
+
+:root[data-theme="dark"] {
+  --background: 222 47% 8%;
+  --surface: 222 40% 12%;
+  --surface-muted: 222 33% 16%;
+  --foreground: 210 40% 96%;
+  --muted-foreground: 215 20% 65%;
+  --border: 217 25% 22%;
+
+  --primary: 243 82% 68%;
+  --primary-hover: 243 82% 74%;
+  --primary-foreground: 222 47% 11%;
+  --primary-soft: 243 40% 20%;
+
+  --success: 158 64% 52%;
+  --success-soft: 160 45% 17%;
+  --warning: 43 96% 58%;
+  --warning-soft: 38 45% 18%;
+  --danger: 350 89% 68%;
+  --danger-soft: 350 40% 20%;
+  --info: 199 89% 62%;
+  --info-soft: 200 45% 18%;
+
+  --ring: 243 82% 68%;
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Respect users who ask for less motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.animate-pulse-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
