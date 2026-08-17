@@ -10,5 +10,8 @@
     "dev:api": "npm run start:dev --workspace=apps/api",
     "lint": "npm run lint --workspace=apps/web && npm run lint --workspace=apps/api",
     "test": "npm run test --workspace=apps/api && npm run test --workspace=apps/web"
+  },
+  "devDependencies": {
+    "playwright": "^1.62.1"
   }
 }

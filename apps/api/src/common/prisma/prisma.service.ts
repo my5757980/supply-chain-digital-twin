@@ -31,14 +31,22 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
     context: TenantContext,
     work: (tx: TenantScopedClient) => Promise<T>,
   ): Promise<T> {
-    return this.$transaction(async (tx) => {
-      if (context.tenantId) {
-        await tx.$executeRaw`SELECT set_config('app.tenant_id', ${context.tenantId}, true)`;
-      }
-      await tx.$executeRaw`SELECT set_config('app.is_platform_admin', ${
-        context.isPlatformAdmin ? "true" : "false"
-      }, true)`;
-      return work(tx);
-    });
+    return this.$transaction(
+      async (tx) => {
+        if (context.tenantId) {
+          await tx.$executeRaw`SELECT set_config('app.tenant_id', ${context.tenantId}, true)`;
+        }
+        await tx.$executeRaw`SELECT set_config('app.is_platform_admin', ${
+          context.isPlatformAdmin ? "true" : "false"
+        }, true)`;
+        return work(tx);
+      },
+      // RLS forces *every* request through an interactive transaction, so
+      // Prisma's defaults (2s to acquire a connection, 5s to finish) are far
+      // too tight here: a single slow scheduled job, or the host being busy,
+      // turns ordinary reads into 500s. These are ceilings for pathological
+      // cases, not a latency target — normal reads still land in tens of ms.
+      { maxWait: 15_000, timeout: 20_000 },
+    );
   }
 }

@@ -95,7 +95,7 @@ by a human, so edit the wording until it sounds like you.
 > supplier and a plan, in plain language.
 >
 > Built for the du SME Resilience & Innovation Challenge.
-> ↓ 90 second demo
+> ↓ 77 second demo
 >
 > github.com/my5757980/supply-chain-digital-twin
 >

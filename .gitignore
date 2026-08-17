@@ -37,10 +37,13 @@ Thumbs.db
 # Prisma
 apps/api/prisma/*.db
 
-# Demo build artefacts — regenerate with demo/build-video.ps1.
-# The finished video is committed; the intermediate frames are not.
+# Demo build artefacts — regenerate with demo/record-demo.mjs and
+# demo/build-video.ps1. The finished video is committed; the raw capture
+# and the intermediate caption files are not.
+demo/raw/
 demo/frames/
 demo/.build/
+demo/.probe*
 
 # Playwright MCP scratch
 .playwright-mcp/
