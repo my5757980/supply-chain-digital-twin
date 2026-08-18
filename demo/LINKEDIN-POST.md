@@ -1,11 +1,73 @@
 # LinkedIn post drafts
 
-Three versions. Pick one — don't post all three. Each is written to be read
+Four versions. Pick one — don't post all four. Each is written to be read
 by a human, so edit the wording until it sounds like you.
+
+Start with the full version below; it is the one that answers all three
+questions a reader has (what is it, why does it exist, what is it built
+with) without turning into a spec sheet.
 
 ---
 
-## Option A — the problem-first one (recommended)
+## The full version — post this one with the video
+
+> Most small businesses in the UAE find out their supplier is late on the
+> day the delivery doesn't arrive.
+>
+> By then the choices are bad: pay a premium for an emergency order, or
+> tell your customers you're out of stock.
+>
+> I built **SupplyTwin** for the du SME Resilience & Innovation Challenge —
+> a live digital twin of a small business's supply chain that sees the
+> pattern before it becomes a stockout.
+>
+> 𝗪𝗵𝗮𝘁 𝗶𝘁 𝗱𝗼𝗲𝘀
+> → Builds one live view of stock, suppliers and orders
+> → Predicts a supplier disruption at least 48 hours ahead
+> → Finds an alternative — the business's own backup supplier first, then
+>   verified local suppliers
+> → Hands the owner a step-by-step plan they can accept, change or ignore
+>
+> 𝗛𝗼𝘄 𝗶𝘁'𝘀 𝗯𝘂𝗶𝗹𝘁
+> Next.js 14 and Tailwind on the front end. NestJS 10 with Prisma for the
+> platform service. A separate FastAPI service runs the three agents —
+> prediction, sourcing, contingency plan. PostgreSQL 15 and Redis 7
+> underneath, Server-Sent Events for the live updates. The language model
+> sits behind an OpenAI-compatible client, so switching provider is three
+> environment variables, not a code change.
+>
+> 𝗧𝗵𝗿𝗲𝗲 𝘁𝗵𝗶𝗻𝗴𝘀 𝗜 𝗺𝗮𝗱𝗲 𝗻𝗼𝗻-𝗻𝗲𝗴𝗼𝘁𝗶𝗮𝗯𝗹𝗲
+>
+> **The AI doesn't get to decide the guarantees.** The 48-hour floor and
+> the sourcing priority are plain code, checked twice. The model writes the
+> explanation, not the rule.
+>
+> **The database enforces tenant isolation, not the application.** Postgres
+> row-level security, running under a non-superuser role so the policies
+> actually apply. It fails closed — missing context returns zero rows,
+> never everything.
+>
+> **No data reaches a model without consent.** It's a step in signup, and
+> the pipeline returns 403 without it.
+>
+> And the app shows you the predictions it got wrong. Hiding those would
+> make the track record look better than it is.
+>
+> 96 tests. Built spec-first — constitution → spec → plan → tasks — with
+> the full build log in the repo.
+>
+> To be straight about what this is: a working prototype running locally,
+> not a deployed product. Login is still a development shim and alerts are
+> logged rather than emailed. But everything in the video is real output
+> from the real system — no mockups.
+>
+> 77-second demo below. Code: github.com/my5757980/supply-chain-digital-twin
+>
+> #SupplyChain #AI #UAE #SME #du #Ignyte #ResilienceTech #BuildInPublic
+
+---
+
+## Option A — the problem-first one
 
 > Most small businesses in the UAE find out their supplier is late the day
 > the delivery doesn't show up.
