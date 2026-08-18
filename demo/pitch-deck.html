@@ -1,0 +1,651 @@
+<title>SupplyTwin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+
+<style>
+  /* Light palette is the default and is defined in full here.
+     Dark redefines tokens only — never component colours. */
+  :root {
+    --ground:      #F2F5F4;
+    --surface:     #FFFFFF;
+    --surface-alt: #E9EFED;
+    --ink:         #12303A;
+    --ink-soft:    #4A6570;
+    --ink-faint:   #7C959B;
+    --rule:        #D3DEDB;
+    --accent:      #B4670F;
+    --accent-ink:  #FFFFFF;
+    --accent-wash: #F7E7D0;
+    --good:        #256B5B;
+    --good-wash:   #DCEBE6;
+    --critical:    #9C3625;
+    --critical-wash:#F5DFDA;
+    --shadow:      0 1px 2px rgba(18,48,58,.06), 0 8px 24px rgba(18,48,58,.06);
+
+    --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+    --body:    "Source Serif 4", Georgia, "Times New Roman", serif;
+    --mono:    "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:      #0D242C;
+      --surface:     #123038;
+      --surface-alt: #173A44;
+      --ink:         #E8EFED;
+      --ink-soft:    #A8BEC2;
+      --ink-faint:   #77949B;
+      --rule:        #234852;
+      --accent:      #E8A34C;
+      --accent-ink:  #1A1206;
+      --accent-wash: #35291A;
+      --good:        #66B8A1;
+      --good-wash:   #17332D;
+      --critical:    #DE8570;
+      --critical-wash:#3A211B;
+      --shadow:      0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.28);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground:      #0D242C;
+    --surface:     #123038;
+    --surface-alt: #173A44;
+    --ink:         #E8EFED;
+    --ink-soft:    #A8BEC2;
+    --ink-faint:   #77949B;
+    --rule:        #234852;
+    --accent:      #E8A34C;
+    --accent-ink:  #1A1206;
+    --accent-wash: #35291A;
+    --good:        #66B8A1;
+    --good-wash:   #17332D;
+    --critical:    #DE8570;
+    --critical-wash:#3A211B;
+    --shadow:      0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.28);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 17px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .deck {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    padding: 28px 20px 96px;
+    max-width: 1180px;
+    margin: 0 auto;
+  }
+
+  /* Each slide holds a 16:9 frame on screen and one page in print. */
+  .slide {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    box-shadow: var(--shadow);
+    padding: 52px 60px 60px;
+    min-height: 620px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    overflow: hidden;
+  }
+
+  /* The amber rail marks the five slides that answer the brief's five
+     required sections. Slides without it are supporting material. */
+  .slide[data-required]::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 5px;
+    background: var(--accent);
+  }
+
+  .eyebrow {
+    font-family: var(--display);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+  .eyebrow .req {
+    font-family: var(--mono);
+    color: var(--accent);
+    letter-spacing: .04em;
+  }
+
+  h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; }
+
+  h1 {
+    font-size: clamp(38px, 5.2vw, 60px);
+    font-weight: 700;
+    line-height: 1.02;
+    letter-spacing: -.022em;
+  }
+  h2 {
+    font-size: clamp(27px, 3.2vw, 38px);
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -.016em;
+  }
+  h3 {
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -.005em;
+  }
+
+  p { margin: 0; max-width: 68ch; }
+  .lede { font-size: 20px; line-height: 1.5; color: var(--ink-soft); max-width: 62ch; }
+  .muted { color: var(--ink-soft); }
+  strong { font-weight: 600; }
+
+  /* — title slide — */
+  .title-slide { justify-content: center; gap: 26px; }
+  .wordmark {
+    font-family: var(--display);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .3em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .title-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 40px;
+    row-gap: 14px;
+    border-top: 1px solid var(--rule);
+    padding-top: 22px;
+    margin-top: 8px;
+  }
+  .title-meta div { display: flex; flex-direction: column; gap: 3px; }
+  .title-meta dt {
+    font-family: var(--display);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .11em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+  .title-meta dd { margin: 0; font-size: 15px; }
+
+  /* — the clock strip: the product's whole argument is about time — */
+  .timeline {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .timeline > div { padding: 20px 24px; }
+  .t-before { background: var(--surface-alt); }
+  .t-after  { background: var(--accent-wash); border-left: 1px solid var(--rule); }
+  .t-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 6px;
+  }
+  .t-after .t-label { color: var(--accent); }
+  .t-headline { font-family: var(--display); font-size: 19px; font-weight: 600; line-height: 1.25; }
+  .t-sub { font-size: 15px; color: var(--ink-soft); margin-top: 6px; }
+
+  /* — step loop — */
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--rule); border: 1px solid var(--rule); border-radius: 3px; overflow: hidden; }
+  .step { background: var(--surface); padding: 18px 20px; display: flex; flex-direction: column; gap: 6px; }
+  .step-n {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent);
+  }
+  .step p { font-size: 15px; color: var(--ink-soft); }
+
+  /* — generic card columns — */
+  .cols { display: grid; gap: 20px; }
+  .cols-2 { grid-template-columns: 1fr 1fr; }
+  .cols-3 { grid-template-columns: repeat(3, 1fr); }
+  .card {
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 20px 22px;
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .card p { font-size: 15px; color: var(--ink-soft); }
+  .card.is-accent { background: var(--accent-wash); border-color: transparent; }
+  .card.is-good { background: var(--good-wash); border-color: transparent; }
+  .card.is-critical { background: var(--critical-wash); border-color: transparent; }
+
+  /* — tables — */
+  .table-wrap { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 15px; }
+  th, td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  thead th {
+    font-family: var(--display);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    border-bottom: 1px solid var(--ink-faint);
+    white-space: nowrap;
+  }
+  td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .kpi-target { font-family: var(--mono); font-weight: 500; color: var(--accent); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+  /* — pilot stages — */
+  .stages { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .stage { border: 1px solid var(--rule); border-radius: 3px; overflow: hidden; display: flex; flex-direction: column; }
+  .stage-head { padding: 16px 20px 14px; background: var(--surface-alt); border-bottom: 1px solid var(--rule); }
+  .stage-count { font-family: var(--display); font-size: 32px; font-weight: 700; line-height: 1; letter-spacing: -.02em; }
+  .stage-when { font-family: var(--mono); font-size: 11px; color: var(--ink-faint); margin-top: 6px; letter-spacing: .04em; }
+  .stage-body { padding: 16px 20px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+  .stage-body p { font-size: 14px; color: var(--ink-soft); }
+  .exit {
+    font-size: 13px;
+    border-top: 1px dashed var(--rule);
+    padding-top: 10px;
+    margin-top: auto;
+    color: var(--ink);
+  }
+  .exit b { font-family: var(--display); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); display: block; margin-bottom: 4px; }
+
+  /* — status chips for the honesty slide — */
+  .chip {
+    display: inline-block;
+    font-family: var(--display);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    padding: 4px 9px;
+    border-radius: 2px;
+  }
+  .chip-built { background: var(--good); color: var(--ground); }
+  .chip-sim { background: var(--accent); color: var(--accent-ink); }
+  .chip-not { background: var(--critical); color: var(--ground); }
+
+  ul { margin: 0; padding-left: 1.1em; }
+  li { margin-bottom: 6px; }
+  li::marker { color: var(--ink-faint); }
+  .tight li { margin-bottom: 3px; font-size: 15px; color: var(--ink-soft); }
+
+  .slide-no {
+    position: absolute;
+    right: 26px;
+    bottom: 20px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-faint);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .footer-note {
+    text-align: center;
+    font-size: 13px;
+    color: var(--ink-faint);
+    font-family: var(--mono);
+  }
+  a { color: var(--accent); text-underline-offset: 3px; }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  @media (max-width: 860px) {
+    .slide { padding: 34px 26px 46px; min-height: 0; }
+    .cols-2, .cols-3, .steps, .stages, .timeline { grid-template-columns: 1fr; }
+    .t-after { border-left: none; border-top: 1px solid var(--rule); }
+    h1 { font-size: 34px; }
+  }
+
+  @media print {
+    @page { size: 1280px 720px; margin: 0; }
+    body { background: #FFFFFF; }
+    .deck { padding: 0; gap: 0; max-width: none; }
+    .slide {
+      break-after: page;
+      page-break-after: always;
+      border: none;
+      box-shadow: none;
+      border-radius: 0;
+      min-height: 720px;
+      height: 720px;
+      padding: 54px 64px;
+    }
+    .slide:last-child { break-after: auto; page-break-after: auto; }
+    .footer-note { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+
+<div class="deck">
+
+  <!-- 1 — title -->
+  <section class="slide title-slide">
+    <div class="wordmark">SupplyTwin</div>
+    <h1>Know your supplier is going to be late — before they do.</h1>
+    <p class="lede">A live digital twin of an SME's supply chain that predicts a
+      disruption at least 48 hours out, names an alternative supplier, and hands
+      the owner a plan they can act on in minutes.</p>
+    <dl class="title-meta">
+      <div><dt>Challenge</dt><dd>du SME Resilience &amp; Innovation</dd></div>
+      <div><dt>Track</dt><dd>Theme 1 · ResilienceTech</dd></div>
+      <div><dt>Theme</dt><dd>AI-Driven Supply Chain Digital Twins</dd></div>
+      <div><dt>Status</dt><dd>Working system, not a concept</dd></div>
+    </dl>
+    <span class="slide-no">01</span>
+  </section>
+
+  <!-- 2 — problem -->
+  <section class="slide">
+    <div class="eyebrow">The problem</div>
+    <h2>The information existed. Nobody had time to assemble it.</h2>
+    <div class="timeline">
+      <div class="t-before">
+        <div class="t-label">Today · delivery morning</div>
+        <div class="t-headline">The van doesn't arrive.</div>
+        <p class="t-sub">Both remaining options are bad: pay a premium for an
+          emergency order, or tell customers the shelf is empty.</p>
+      </div>
+      <div class="t-after">
+        <div class="t-label">With SupplyTwin · 48 hours earlier</div>
+        <div class="t-headline">"Gulf Wholesale is likely to slip. Desert Star can cover it."</div>
+        <p class="t-sub">Named alternative, step-by-step plan, owner decides.</p>
+      </div>
+    </div>
+    <p>The signals were already there — this supplier slipped three times in
+      thirty days, and that item is below its reorder level. Larger firms catch
+      this with supply-chain planners and six-figure ERP modules. An SME has
+      neither the headcount nor the licence.</p>
+    <span class="slide-no">02</span>
+  </section>
+
+  <!-- 3 — concept summary -->
+  <section class="slide" data-required>
+    <div class="eyebrow"><span class="req">Required 1</span> Concept Summary</div>
+    <h2>One live model of stock, suppliers and orders — that hands over a decision, not a dashboard.</h2>
+    <div class="cols cols-3">
+      <div class="card">
+        <h3>Ingest</h3>
+        <p>CSV, manual entry, or API. Setup takes about two minutes and needs no
+          IT project — because an SME that needs an integration project will
+          never start.</p>
+      </div>
+      <div class="card">
+        <h3>Predict</h3>
+        <p>Supplier signals are evaluated against the twin. Every alert carries a
+          confidence score and a rationale written in the owner's language.</p>
+      </div>
+      <div class="card">
+        <h3>Act</h3>
+        <p>An alternative supplier and a numbered plan. The owner accepts,
+          adjusts or dismisses. Nothing happens without them.</p>
+      </div>
+    </div>
+    <p class="muted">Track: <strong>Resilience</strong> — Theme 1, AI-Driven
+      Supply Chain Digital Twins.</p>
+    <span class="slide-no">03</span>
+  </section>
+
+  <!-- 4 — how it works -->
+  <section class="slide">
+    <div class="eyebrow">How it works in practice</div>
+    <h2>Six steps, and the owner holds the last one.</h2>
+    <div class="steps">
+      <div class="step"><span class="step-n">01</span><h3>Ingest</h3><p>Stock, suppliers, open orders — however the business already keeps them.</p></div>
+      <div class="step"><span class="step-n">02</span><h3>Model</h3><p>A live twin: lead times, reorder levels, which supplier serves which item.</p></div>
+      <div class="step"><span class="step-n">03</span><h3>Predict</h3><p>A disruption prediction with confidence and a plain-language rationale.</p></div>
+      <div class="step"><span class="step-n">04</span><h3>Source</h3><p>The business's <em>own</em> backup supplier first, then verified local suppliers.</p></div>
+      <div class="step"><span class="step-n">05</span><h3>Plan</h3><p>Numbered steps in the language an owner uses, not a planner's.</p></div>
+      <div class="step"><span class="step-n">06</span><h3>Decide</h3><p>Accept, adjust, dismiss. Automatic action is opt-in, per supplier.</p></div>
+    </div>
+    <span class="slide-no">04</span>
+  </section>
+
+  <!-- 5 — the three decisions -->
+  <section class="slide">
+    <div class="eyebrow">What makes it trustworthy</div>
+    <h2>Three decisions we would defend in front of a regulator.</h2>
+    <div class="cols cols-3">
+      <div class="card is-accent">
+        <h3>The AI doesn't set the guarantees</h3>
+        <p>The 48-hour floor and the sourcing priority are ordinary code with
+          tests around them. A model that drifts changes the wording of an
+          alert — it cannot change how early the alert fires.</p>
+      </div>
+      <div class="card is-accent">
+        <h3>The database enforces isolation</h3>
+        <p>PostgreSQL row-level security, forced, under a non-superuser role.
+          Missing tenant context returns zero rows, never every row. It fails
+          closed.</p>
+      </div>
+      <div class="card is-accent">
+        <h3>It shows what it got wrong</h3>
+        <p>Every warning is listed, including the ones that came to nothing. An
+          owner who cannot see the misses has no basis for trusting the hits.</p>
+      </div>
+    </div>
+    <p class="muted">At 40,000 SMEs on shared infrastructure, an application-layer
+      tenant check is one forgotten <code>WHERE</code> clause away from a breach.
+      That is why this one lives in the database.</p>
+    <span class="slide-no">05</span>
+  </section>
+
+  <!-- 6 — integration -->
+  <section class="slide" data-required>
+    <div class="eyebrow"><span class="req">Required 2</span> Integration Plan</div>
+    <h2>API-first, contract-first — and du already has the relationship.</h2>
+    <div class="cols cols-2">
+      <div class="card">
+        <h3>Three ingestion paths, by SME maturity</h3>
+        <ul class="tight">
+          <li><strong>CSV upload</strong> — businesses running on spreadsheets, which is most of them</li>
+          <li><strong>Manual entry</strong> — the smallest, with a handful of SKUs</li>
+          <li><strong>REST + webhooks</strong> — anyone with a POS or accounting system</li>
+        </ul>
+        <p>The OpenAPI 3 contract is the source of truth, lives in the repository
+          and is served at <code>/docs</code>. A test parses it on every commit.</p>
+      </div>
+      <div class="card">
+        <h3>Where it meets du</h3>
+        <ul class="tight">
+          <li><strong>Identity</strong> — du SSO replaces the onboarding module without touching the twin</li>
+          <li><strong>Distribution</strong> — the pilot cohort is a segment query, not a campaign</li>
+          <li><strong>Notification</strong> — du's SMS or WhatsApp gateway is a provider, not a redesign</li>
+          <li><strong>Directory</strong> — a du-verified supplier list drops in as a data source</li>
+        </ul>
+      </div>
+    </div>
+    <p>Three containerised services over shared PostgreSQL and Redis. Nothing is
+      tied to one cloud, and the language model sits behind an OpenAI-compatible
+      client — the provider is three environment variables, already exercised
+      against more than one vendor.</p>
+    <span class="slide-no">06</span>
+  </section>
+
+  <!-- 7 — pilot -->
+  <section class="slide" data-required>
+    <div class="eyebrow"><span class="req">Required 3</span> Pilot Strategy · 150+ du SME partners</div>
+    <h2>The cohort widens only when the last stage has earned it.</h2>
+    <div class="stages">
+      <div class="stage">
+        <div class="stage-head">
+          <div class="stage-count">5</div>
+          <div class="stage-when">Design partners · weeks 1–2</div>
+        </div>
+        <div class="stage-body">
+          <p>Food distribution, retail and spare parts. The goal is not usage
+            metrics — it is having a practitioner correct the system's judgement.</p>
+          <div class="exit"><b>Exit test</b>Three of five confirm the plans read like something they would actually send.</div>
+        </div>
+      </div>
+      <div class="stage">
+        <div class="stage-head">
+          <div class="stage-count">25</div>
+          <div class="stage-when">Closed pilot · weeks 3–6</div>
+        </div>
+        <div class="stage-body">
+          <p>A du segment query supplies the cohort: SMEs holding physical stock
+            with more than one supplier. Onboarding is self-serve; we watch where
+            people stop.</p>
+          <div class="exit"><b>Exit test</b>≥80% onboard unaided · ≥1 real disruption caught ≥48h out · zero isolation incidents.</div>
+        </div>
+      </div>
+      <div class="stage">
+        <div class="stage-head">
+          <div class="stage-count">150+</div>
+          <div class="stage-when">Scale pilot · weeks 7–16</div>
+        </div>
+        <div class="stage-body">
+          <p>Three waves of roughly fifty, so a defect found in wave one never
+            reaches wave three. Automatic action stays opt-in throughout.</p>
+          <div class="exit"><b>Exit test</b>The success metrics, measured against each business's own first four weeks.</div>
+        </div>
+      </div>
+    </div>
+    <p class="muted">A system that mispredicts for 150 businesses at once does not
+      get a second chance with them.</p>
+    <span class="slide-no">07</span>
+  </section>
+
+  <!-- 8 — metrics -->
+  <section class="slide" data-required>
+    <div class="eyebrow"><span class="req">Required 4</span> Success Metrics</div>
+    <h2>Targets the pilot is designed to validate — not results already claimed.</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>KPI</th><th>Baseline</th><th>Target</th><th>Measured by</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Warning lead time</strong></td><td class="num">0h</td><td class="kpi-target">≥ 48h</td><td>Alert timestamp vs predicted impact date. Enforced in code</td></tr>
+          <tr><td><strong>Stockout reduction</strong></td><td>Own weeks 1–4</td><td class="kpi-target">≥ 40%</td><td>Items below reorder with no inbound order, before vs after</td></tr>
+          <tr><td><strong>Warning → action</strong></td><td>Days</td><td class="kpi-target">&lt; 10 min</td><td>Alert delivered → owner decision recorded</td></tr>
+          <tr><td><strong>Alternative found</strong></td><td>—</td><td class="kpi-target">≥ 90%</td><td>Alerts carrying a named alternative ÷ all alerts</td></tr>
+          <tr><td><strong>Owner acceptance</strong></td><td>—</td><td class="kpi-target">≥ 50%</td><td>Plans accepted or adjusted rather than dismissed</td></tr>
+          <tr><td><strong>False positive rate</strong></td><td>—</td><td class="kpi-target">≤ 30%</td><td>Published whatever it is — shown in-product, not just to du</td></tr>
+          <tr><td><strong>Onboarding completion</strong></td><td>—</td><td class="kpi-target">≥ 80%</td><td>Signup → first twin view, unaided, median under 5 min</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="muted">"Warning → action" is the brief's <em>business pivot speed</em>:
+      moving an order to a different supplier goes from days to minutes.</p>
+    <span class="slide-no">08</span>
+  </section>
+
+  <!-- 9 — risk -->
+  <section class="slide" data-required>
+    <div class="eyebrow"><span class="req">Required 5</span> Risk Mitigation</div>
+    <h2>The risks that would actually end a pilot.</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Risk</th><th>Mitigation</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Cross-tenant data leak</strong><br><span class="muted">One leak ends the pilot</span></td><td>Enforced in PostgreSQL, not the app — RLS forced, non-superuser runtime role, fails closed on missing context, covered by isolation tests</td></tr>
+          <tr><td><strong>A wrong recommendation costs real money</strong></td><td>The owner decides. Automatic action is off by default, opt-in per supplier, gated on a confidence threshold they set. Every recommendation is audit-logged with its inputs</td></tr>
+          <tr><td><strong>Model drift or a provider change</strong></td><td>The guarantees are not in the model. The 48-hour floor and sourcing priority are code with tests; the model writes prose and a score</td></tr>
+          <tr><td><strong>PDPL and data residency</strong></td><td>No data reaches a model without explicit, revocable consent — enforced as a 403, not a checkbox. Deployment is region-portable</td></tr>
+          <tr><td><strong>Alert fatigue</strong><br><span class="muted">The classic failure of this category</span></td><td>False positive rate is a published KPI shown to the SME. Escalation is staged and the track record is visible, so trust is earned rather than assumed</td></tr>
+          <tr><td><strong>Stale data served as current</strong></td><td>A freshness checker marks sources stale and flags the twin rather than quietly serving last month's numbers</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <span class="slide-no">09</span>
+  </section>
+
+  <!-- 10 — honesty -->
+  <section class="slide">
+    <div class="eyebrow">Where this actually stands</div>
+    <h2>What is built, what is simulated, and what is not built yet.</h2>
+    <div class="cols cols-3">
+      <div class="card is-good">
+        <span class="chip chip-built">Built &amp; working</span>
+        <p>The twin. Three agents against a live model. Consent enforcement.
+          Row-level tenant isolation. Audit trail. Opt-in automatic action. The
+          track-record page. The full API contract.</p>
+        <p><strong>96 automated tests</strong> — 74 platform, 22 AI service.</p>
+      </div>
+      <div class="card is-accent">
+        <span class="chip chip-sim">Simulated</span>
+        <p>Supplier disruption signals. The prediction logic is real; the feed is
+          seeded. Live carrier and port data is a pilot-stage integration, and is
+          scoped as one rather than implied.</p>
+      </div>
+      <div class="card is-critical">
+        <span class="chip chip-not">Not built yet</span>
+        <p>Production authentication — login is a development shim. Outbound
+          email and SMS delivery: intent is recorded, nothing is sent. Deployment
+          to a hosted environment.</p>
+      </div>
+    </div>
+    <p>A load test at pilot scale — 150 tenants, 3,000 inventory items — returned
+      alert delivery p95 of <strong>234ms</strong> and twin reads p95 of
+      <strong>50ms</strong> against a five-minute budget. That is sequential
+      latency on a developer laptop, not a concurrency measurement, and the
+      report says so. Re-running it on the deployed environment is a gate before
+      the 150-SME cohort, not after.</p>
+    <span class="slide-no">10</span>
+  </section>
+
+  <!-- 11 — must-haves -->
+  <section class="slide">
+    <div class="eyebrow">Non-negotiable must-haves</div>
+    <h2>All three, and how.</h2>
+    <div class="cols cols-3">
+      <div class="card">
+        <h3>Built for rapid scalability</h3>
+        <p>Three independently scalable stateless services, containerised, over
+          shared PostgreSQL and Redis. No per-customer infrastructure.</p>
+      </div>
+      <div class="card">
+        <h3>100% digital integration</h3>
+        <p>Signup, data connection, consent, prediction, recommendation, decision
+          and audit are all in-product. No manual or offline step in the core
+          loop.</p>
+      </div>
+      <div class="card">
+        <h3>Scales to 40,000+ SMEs</h3>
+        <p>Row-level isolation on shared tables rather than a database per
+          customer. Validated at 150 tenants; the next gate is 1,500.</p>
+      </div>
+    </div>
+    <span class="slide-no">11</span>
+  </section>
+
+  <!-- 12 — close -->
+  <section class="slide title-slide">
+    <div class="wordmark">SupplyTwin</div>
+    <h2>Most SMEs find out on delivery day. This is the version where they find out first.</h2>
+    <p class="lede">Built spec-first — constitution, spec, plan, tasks — with the
+      full build log, the API contract and every test in the repository.</p>
+    <dl class="title-meta">
+      <div><dt>Code</dt><dd>github.com/my5757980/supply-chain-digital-twin</dd></div>
+      <div><dt>Demo</dt><dd>77-second walkthrough of the running system</dd></div>
+      <div><dt>Submitted by</dt><dd>Muhammad Yaseen</dd></div>
+    </dl>
+    <span class="slide-no">12</span>
+  </section>
+
+</div>
+
+<p class="footer-note">Print or save as PDF — landscape, background graphics on — for a 12-slide deck.</p>
