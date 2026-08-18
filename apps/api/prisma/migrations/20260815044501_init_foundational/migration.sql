@@ -172,7 +172,15 @@ BEGIN
 END
 $$;
 
-GRANT CONNECT ON DATABASE scdt TO app_runtime;
+-- The database name differs by environment: `scdt` locally, `railway` on
+-- Railway, `neondb` on Neon. Hardcoding it here made this statement fail
+-- with `database "scdt" does not exist` on every managed provider, taking
+-- the whole migration -- and the deploy -- down with it.
+DO $grant_connect$
+BEGIN
+  EXECUTE format('GRANT CONNECT ON DATABASE %I TO app_runtime', current_database());
+END
+$grant_connect$;
 GRANT USAGE ON SCHEMA public TO app_runtime;
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO app_runtime;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public

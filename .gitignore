@@ -47,3 +47,10 @@ demo/.probe*
 
 # Playwright MCP scratch
 .playwright-mcp/
+
+# Playwright accessibility snapshots land in the repo root when a bare
+# filename is passed, and they capture whatever page was open — which has
+# included personal data from logged-in sites. Root-level only, so nested
+# config and CI YAML is unaffected.
+/*.yml
+!/docker-compose.yml
