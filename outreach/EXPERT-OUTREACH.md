@@ -13,15 +13,18 @@ messages yourself; automated LinkedIn outreach gets accounts restricted.
 
 ## 1. Connection request note
 
-LinkedIn caps this at 300 characters. This one is 268.
+A free LinkedIn account caps this at **200 characters**, not the 300 Premium
+gets — so write to 200 and it works either way. This one is 189, and it is the
+one that actually got accepted.
 
-> Hi [First name] — I'm building a tool that warns small businesses about
-> supplier delays before they happen. I'd value 20 minutes of your procurement
-> experience to check it reflects how the job really works. I'm not selling
-> anything. Would you be open to a short call?
+> Hi [First name] — I built a tool that warns SMEs about supplier delays 48h
+> early (du SME Challenge). Your sourcing experience is what I'm missing. Could
+> I ask you 20 minutes? Not selling anything.
 
-**Why it works:** names a specific problem, asks for a specific small amount of
-time, and removes the thing they're bracing for ("not selling anything").
+**Why it works:** names a specific problem, cites something real so it doesn't
+read as a template, asks for a small fixed amount of time, and removes the
+thing they're bracing for ("not selling anything"). Use their first name only
+— leaving the brackets in is the fastest way to look automated.
 
 ---
 
@@ -167,3 +170,62 @@ assumptions are wrong — every correction is worth more than an agreement.
 - **The last question matters most.** Someone willing to review your write-up
   is someone who might put their name to it — and that signature is what turns
   this from a project into something you own.
+
+---
+
+## 6. Written variant — when they won't take a call
+
+Some people will answer in writing but never book a call. For them, put the
+questions in the message itself. Seven is about the ceiling; past that the
+reply rate falls off a cliff, so these are the seven that carry the most.
+
+> Thanks for accepting, [First name].
+>
+> Some context. I've built a working tool for the du SME Resilience &
+> Innovation Challenge. It watches a small business's stock, suppliers and
+> orders, flags a likely supplier delay about 48 hours before it hits, and
+> suggests where to source instead. The software side works.
+>
+> What I don't have is the judgement behind it — and that's what decides
+> whether it's actually useful or just another dashboard. You've run
+> procurement here; I haven't.
+>
+> I know your time is short, so I've written the questions out instead of
+> asking for a call. Short answers are genuinely fine — even one line each
+> tells me more than I have now. Answer the ones you feel like and skip the
+> rest.
+>
+> 1. What usually tells you a supplier is going to be late, before they tell
+>    you themselves?
+> 2. When a delivery is at risk, what's the first thing you actually do?
+> 3. What do you check before moving an order to a different supplier? Price,
+>    lead time, quality, payment terms, relationship — what else, and in what
+>    order?
+> 4. How long do you wait for a reply before you chase, and how do you chase —
+>    email, phone or WhatsApp?
+> 5. Could you paste a message you'd actually send a supplier in that
+>    situation, with names removed? This one would help me more than all the
+>    others put together.
+> 6. What decision would you never let software make on your behalf, even if
+>    it got it right most of the time?
+> 7. [One question drawn from their own headline — the thing they list that
+>    nobody else does.]
+>
+> Whatever you send back, I'll write up what I learn and share it with you,
+> and you'll see the tool before anyone outside the challenge does.
+>
+> Thanks either way.
+>
+> [Your name]
+
+**Question 5 is the one that matters.** A real message gives you the trade's
+own wording, and that wording goes straight into what the system sends. It is
+worth more than the other six combined.
+
+**Question 7 is where the vertical might change.** Ask about the speciality
+they put in their own headline. If the answer runs long and warm, the valuable
+problem may not be the one you started building.
+
+**If the reply is two words**, don't take it as failure. Pick the single most
+promising line and go deeper on it — "you mentioned X, could you say a bit more
+about that?" One answered question beats seven ignored ones.
