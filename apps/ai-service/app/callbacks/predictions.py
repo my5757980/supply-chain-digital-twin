@@ -8,6 +8,8 @@ never the reverse: apps/api never reaches into apps/ai-service internals).
 
 from __future__ import annotations
 
+from typing import Any
+
 import httpx
 
 from app.agents.models import DisruptionPrediction
@@ -30,7 +32,7 @@ class PredictionCallbackClient:
         self._service_token = service_token or settings.service_token
         self._client = client or httpx.Client(timeout=10.0)
 
-    def send(self, prediction: DisruptionPrediction) -> dict[str, str]:
+    def send(self, prediction: DisruptionPrediction) -> dict[str, Any]:
         payload = {
             "tenant_id": prediction.tenant_id,
             "type": prediction.type,
@@ -50,5 +52,7 @@ class PredictionCallbackClient:
             response.raise_for_status()
         except httpx.HTTPError as exc:
             raise PredictionCallbackError(str(exc)) from exc
-        result: dict[str, str] = response.json()
+        # `alert_id` alongside a nested `sourcing_candidates` object, so the
+        # values are not uniformly strings.
+        result: dict[str, Any] = response.json()
         return result

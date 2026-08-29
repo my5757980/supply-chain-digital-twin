@@ -23,5 +23,10 @@ class Settings(BaseSettings):
     api_callback_url: str = "http://localhost:4000"
     service_token: str = ""
 
+    # Periodic sweep: how often to ask apps/api for businesses worth
+    # examining. Zero disables it, which is the default — a checkout that
+    # merely runs the test suite should never start calling a live model.
+    sweep_interval_seconds: int = 0
+
 
 settings = Settings()

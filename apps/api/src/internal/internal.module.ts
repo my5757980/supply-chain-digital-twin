@@ -6,6 +6,7 @@ import { NotificationModule } from "../notification/notification.module";
 import { IdentityModule } from "../identity/identity.module";
 import { InternalController } from "./internal.controller";
 import { ServiceTokenGuard } from "./service-token.guard";
+import { SweepCandidatesService } from "./sweep-candidates.service";
 import { PredictionsCallbackController } from "./predictions-callback.controller";
 import { RecommendationsCallbackController } from "./recommendations-callback.controller";
 
@@ -16,7 +17,7 @@ import { RecommendationsCallbackController } from "./recommendations-callback.co
     PredictionsCallbackController,
     RecommendationsCallbackController,
   ],
-  providers: [ServiceTokenGuard],
+  providers: [ServiceTokenGuard, SweepCandidatesService],
   exports: [ServiceTokenGuard],
 })
 export class InternalModule {}

@@ -65,6 +65,7 @@
     "transform": { "^.+\\.(t|j)s$": ["ts-jest", { "isolatedModules": true }] },
     "testPathIgnorePatterns": ["/node_modules/", "/dist/"],
     "testTimeout": 60000,
+    "maxWorkers": 2,
     "collectCoverageFrom": ["src/**/*.(t|j)s"],
     "coverageDirectory": "coverage",
     "testEnvironment": "node"

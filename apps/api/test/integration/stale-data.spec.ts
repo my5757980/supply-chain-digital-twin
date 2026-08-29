@@ -7,7 +7,14 @@ import {
   type OnboardedTenant,
 } from "../helpers/test-app";
 
-async function waitFor(check: () => Promise<boolean>, timeoutMs = 8000): Promise<void> {
+/**
+ * Polls until the condition holds, so it costs nothing when the queue is
+ * quick. The budget is generous because it is spent waiting on the async
+ * ingestion worker while the rest of the suite runs in parallel: at 8s this
+ * intermittently expired in `beforeAll` under a full run, failing the whole
+ * suite for a reason that had nothing to do with what it tests.
+ */
+async function waitFor(check: () => Promise<boolean>, timeoutMs = 30000): Promise<void> {
   const start = Date.now();
   while (Date.now() - start < timeoutMs) {
     if (await check()) return;
