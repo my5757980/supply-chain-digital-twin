@@ -58,11 +58,13 @@ export interface SessionUser {
   role: "owner" | "staff" | "platform_admin";
 }
 
-export function devLogin(userId: string): Promise<SessionUser> {
-  return request<SessionUser>("/auth/dev-login", {
-    method: "POST",
-    body: JSON.stringify({ userId }),
-  });
+/**
+ * Signs in to the pre-seeded demonstration tenant. Takes no arguments on
+ * purpose: the account is fixed on the server, so this cannot be used to
+ * reach anyone else's business.
+ */
+export function demoLogin(): Promise<SessionUser> {
+  return request<SessionUser>("/auth/demo-login", { method: "POST" });
 }
 
 export function getSession(): Promise<SessionUser> {

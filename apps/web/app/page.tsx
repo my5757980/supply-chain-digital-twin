@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, BellRing, ClipboardCheck, Radar, Waypoints } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { DemoLoginButton } from "@/components/demo-login-button";
 
 const FEATURES = [
   {
@@ -52,11 +53,7 @@ export default function HomePage(): React.JSX.Element {
                 <ArrowRight />
               </Button>
             </Link>
-            <Link href="/twin">
-              <Button size="lg" variant="outline">
-                View a live twin
-              </Button>
-            </Link>
+            <DemoLoginButton />
           </div>
           <p className="text-sm text-muted-foreground">
             Takes about two minutes. No card, no IT team needed.

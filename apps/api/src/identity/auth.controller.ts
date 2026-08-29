@@ -47,6 +47,28 @@ export class AuthController {
     return sessionUser;
   }
 
+  /**
+   * Signs in to one pre-seeded demonstration tenant, so the hosted demo can
+   * be opened and used without real credentials.
+   *
+   * It takes no parameters. The account is fixed by `DEMO_OWNER_USER_ID` on
+   * the server, and the endpoint is inert unless that variable is set — so
+   * unlike `/auth/dev-login`, no caller-supplied id can turn this into a
+   * "log in as anyone" hole. Point it only at a tenant seeded with sample
+   * data, never at a real business.
+   */
+  @Post("demo-login")
+  @HttpCode(200)
+  async demoLogin(@Req() req: AuthenticatedRequest): Promise<SessionUser> {
+    const demoOwnerId = this.config.get<string>("DEMO_OWNER_USER_ID");
+    if (!demoOwnerId) {
+      throw new ForbiddenException("No demonstration account is configured");
+    }
+    const sessionUser = await this.authService.findSessionUserById(demoOwnerId);
+    req.session.user = sessionUser;
+    return sessionUser;
+  }
+
   @Post("logout")
   @HttpCode(204)
   logout(@Req() req: AuthenticatedRequest): Promise<void> {

@@ -20,7 +20,6 @@ import { Notice } from "@/components/ui/feedback";
 import { cn } from "@/lib/utils";
 import {
   createTenant,
-  devLogin,
   createInventoryItem,
   createSupplier,
   uploadCsv,
@@ -60,15 +59,15 @@ export default function OnboardingPage(): React.JSX.Element {
     setError(null);
     setSubmitting(true);
     try {
-      const tenant = await createTenant({
+      // Creating the business signs the owner in as part of the same
+      // request, so a first-time user never meets a separate login step —
+      // and there is no second call here to fail once the development
+      // login shim is switched off in a hosted environment.
+      await createTenant({
         business_name: businessName,
         sector,
         owner_email_or_phone: ownerContact,
       });
-      // Sign the owner in immediately so a first-time, non-technical user
-      // never sees a separate login step. `owner_user_id` is a dev-mode
-      // bootstrap field (see tenant.mapper.ts).
-      await devLogin(tenant.owner_user_id);
       setStep("connect-data");
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Something went wrong. Please try again.");

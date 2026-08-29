@@ -1,5 +1,6 @@
 import { Body, Controller, ForbiddenException, HttpCode, Post, Req, UseGuards } from "@nestjs/common";
 import { TenantService } from "./tenant.service";
+import { AuthService } from "./auth.service";
 import { CreateTenantDto } from "./dto/create-tenant.dto";
 import { toTenantResponse, type TenantResponse } from "./tenant.mapper";
 import { AuthGuard, type AuthenticatedRequest } from "./auth.guard";
@@ -15,16 +16,36 @@ export interface AiConsentResponse {
 
 @Controller("tenants")
 export class TenantController {
-  constructor(private readonly tenantService: TenantService) {}
+  constructor(
+    private readonly tenantService: TenantService,
+    private readonly authService: AuthService,
+  ) {}
 
+  /**
+   * Signing up also signs you in, as the owner this request just created.
+   *
+   * The alternative — returning the new owner id and having the client post
+   * it to a login endpoint — is what `/auth/dev-login` did, and it is unsafe
+   * anywhere real: it accepts *any* user id, so knowing one is enough to
+   * become that user. It is therefore disabled in production, which left
+   * onboarding with no way to establish a session there at all.
+   *
+   * Issuing the session here instead is safe by construction. The client
+   * never supplies an id; the only session obtainable is one for a tenant
+   * the caller created in this same request.
+   */
   @Post()
   @HttpCode(201)
-  async create(@Body() dto: CreateTenantDto): Promise<TenantResponse> {
+  async create(
+    @Body() dto: CreateTenantDto,
+    @Req() req: AuthenticatedRequest,
+  ): Promise<TenantResponse> {
     const { tenant, ownerUserId } = await this.tenantService.onboard({
       businessName: dto.business_name,
       sector: dto.sector,
       ownerEmailOrPhone: dto.owner_email_or_phone,
     });
+    req.session.user = await this.authService.findSessionUserById(ownerUserId);
     return toTenantResponse(tenant, ownerUserId);
   }
 

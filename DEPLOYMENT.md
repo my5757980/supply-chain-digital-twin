@@ -71,6 +71,7 @@ psql "postgresql://app_runtime:app_runtime_local_dev@<host>:5432/<db>" -c "SELEC
      | `SESSION_SECRET` | a long random string |
      | `AI_SERVICE_TOKEN` | a long random string |
      | `CORS_ORIGINS` | your Vercel URL, e.g. `https://supplytwin.vercel.app` |
+     | `DEMO_OWNER_USER_ID` | owner id of a seeded demo tenant, for `POST /auth/demo-login`. Leave unset to disable |
      | `THROTTLE_LIMIT` | optional, defaults to 300/min per tenant |
 4. Deploy `apps/ai-service`:
    - Root directory: `apps/ai-service`
@@ -109,11 +110,16 @@ is listed explicitly.
 
 ## 4. Known gaps before a real pilot
 
-- **Authentication is a development shim.** `/auth/dev-login` accepts a
-  user id with no credential check. It is disabled when
-  `NODE_ENV=production`, which means production currently has *no* login
-  path — a managed auth provider must be wired in before real SMEs use
-  this (see `research.md` §6).
+- **Authentication is still a shim, though production now has a way in.**
+  `/auth/dev-login` accepts any user id with no credential check and stays
+  disabled when `NODE_ENV=production`. Two paths replace it there: signing
+  up issues the session for the owner it just created (safe by
+  construction — the client supplies no id), and `POST /auth/demo-login`
+  signs in to the single tenant named by `DEMO_OWNER_USER_ID`, taking no
+  parameters. Neither is a substitute for real credentials: there is no
+  password, so anyone with the demo URL is that demo account. A managed
+  auth provider must be wired in before real SMEs use this (see
+  `research.md` §6).
 - **Email notifications are logged, not sent.** `AlertNotifierService`
   records `channels_sent` accurately but no provider is connected.
 - **Load figures are from a laptop.** See `load-test-report.md`; re-run
