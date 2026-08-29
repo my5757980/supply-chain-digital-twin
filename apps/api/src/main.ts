@@ -29,6 +29,16 @@ async function bootstrap(): Promise<void> {
   app.useGlobalFilters(new AllExceptionsFilter());
 
   const isProduction = config.get<string>("NODE_ENV") === "production";
+
+  if (isProduction) {
+    // Hosting platforms terminate TLS at their edge and forward plain HTTP
+    // to the container, so Express sees `req.secure === false` and
+    // express-session silently declines to set a `secure` cookie — the user
+    // logs in and never receives a session. Trusting the first proxy hop
+    // restores the original protocol from X-Forwarded-Proto.
+    app.getHttpAdapter().getInstance().set("trust proxy", 1);
+  }
+
   const sessionSecret = config.get<string>("SESSION_SECRET") ?? "dev-only-insecure-secret";
   app.use(createSessionMiddleware(redisService, sessionSecret, isProduction));
 
