@@ -17,7 +17,11 @@ class Settings(BaseSettings):
     # LLM provider (OpenAI-compatible). Defaults target Groq.
     llm_api_key: str = ""
     llm_base_url: str = "https://api.groq.com/openai/v1"
-    llm_model: str = "llama-3.3-70b-versatile"
+    # Providers retire hosted models without warning — llama-3.3-70b-versatile
+    # was the default here until Groq removed it, at which point every agent
+    # call returned 404 with a valid key. Verify the model still exists
+    # (GET {llm_base_url}/models) when the agents start failing on 404.
+    llm_model: str = "qwen/qwen3.8-27b"
 
     database_url: str = ""
     api_callback_url: str = "http://localhost:4000"
