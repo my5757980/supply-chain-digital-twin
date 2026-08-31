@@ -593,9 +593,11 @@
       </div>
       <div class="card is-critical">
         <span class="chip chip-not">Not built yet</span>
-        <p>Production authentication — login is a development shim. Outbound
-          email and SMS delivery: intent is recorded, nothing is sent. Deployment
-          to a hosted environment.</p>
+        <p>Real authentication — there is no password anywhere; the hosted
+          demo signs in to one seeded account. Outbound email and SMS: intent is
+          recorded, nothing is sent. The periodic sweep is written and tested but
+          not yet deployed, so the hosted alert was raised by running the same
+          pipeline against it once.</p>
       </div>
     </div>
     <p>A load test at pilot scale — 150 tenants, 3,000 inventory items — returned
@@ -639,10 +641,13 @@
     <p class="lede">Built spec-first — constitution, spec, plan, tasks — with the
       full build log, the API contract and every test in the repository.</p>
     <dl class="title-meta">
+      <div><dt>Try it</dt><dd>supply-chain-digital-twin-web.vercel.app</dd></div>
+      <div><dt>API</dt><dd>supply-chain-digital-twin-production.up.railway.app/docs</dd></div>
       <div><dt>Code</dt><dd>github.com/my5757980/supply-chain-digital-twin</dd></div>
-      <div><dt>Demo</dt><dd>77-second walkthrough of the running system</dd></div>
       <div><dt>Submitted by</dt><dd>Muhammad Yaseen</dd></div>
     </dl>
+    <p class="muted">The live link opens a seeded demonstration account — one
+      click, no sign-up. Everything on it is produced by the running system.</p>
     <span class="slide-no">12</span>
   </section>
 
