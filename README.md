@@ -72,8 +72,8 @@ with a development password that must be rotated.
 ## Tests
 
 ```bash
-cd apps/api        && npx jest --runInBand   # 74 tests / 27 suites
-cd apps/ai-service && pytest -q              # 22 tests
+cd apps/api        && npx jest --runInBand   # 88 tests / 30 suites
+cd apps/ai-service && pytest -q              # 26 tests
 cd apps/api        && npm run load:pilot     # 150-tenant latency check
 ```
 

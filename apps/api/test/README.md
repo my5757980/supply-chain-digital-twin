@@ -3,7 +3,7 @@
 ## Running
 
 ```bash
-npx jest --runInBand    # 74 tests / 27 suites
+npx jest --runInBand    # 88 tests / 30 suites
 ```
 
 `--runInBand` is required: every suite boots its own Nest application
@@ -23,7 +23,7 @@ bootstraps being cut off — `auth.spec.ts` failing after 35s was the
 clearest case. 60s is generous enough to absorb that variance while still
 catching a genuine hang.
 
-If the whole suite feels slow, the underlying cause is that 27 suites each
+If the whole suite feels slow, the underlying cause is that 30 suites each
 pay the full app-bootstrap cost. Sharing one application across suites
 would be the real fix; it hasn't been needed yet.
 
